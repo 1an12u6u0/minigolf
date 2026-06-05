@@ -8,7 +8,7 @@ const int cellcountx=25;
 const int cellcounty=30;
 const int cellsize=30;
 
-int level=4;
+int level=1;
 int points=0;
 
 enum GameState{Menu,Gameplay};
