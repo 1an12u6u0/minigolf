@@ -247,6 +247,8 @@ int main(){
 
     Rectangle playButton={(float)GetScreenWidth()/2-100,(float)GetScreenHeight()/2-40,200,50};
     Rectangle quitButton={(float)GetScreenWidth()/2-100,(float)GetScreenHeight()/2+30,200,50};
+    Rectangle volume_down={(float)GetScreenWidth()/2-250,(float)GetScreenHeight()/2+100,200,50};
+    Rectangle volume_up={(float)GetScreenWidth()/2+50,(float)GetScreenHeight()/2+100,200,50};
 
     Color terrain={99, 191, 69, 255};
 
@@ -256,7 +258,6 @@ int main(){
     Music BackgroundMusic=LoadMusicStream("background.mp3");
 
     SetSoundVolume(ball_hit,0.3f);
-    SetMusicVolume(BackgroundMusic,0.08f);
 
     PlayMusicStream(BackgroundMusic);
 
@@ -265,6 +266,7 @@ int main(){
     Vector2 end={0,0};
     float multiplier=0.7f;
     int maxdist=170;
+    float volume=0.08;
 
     Color edges={61, 107, 43, 255};
 
@@ -287,9 +289,24 @@ int main(){
                 if(CheckCollisionPointRec(MousePos,playButton)&&IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
                     CurrentState=Gameplay;
                 }
+                if(CheckCollisionPointRec(MousePos,volume_down)&&IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+                    if(volume>0.01){
+                        volume-=0.01;
+                    }
+                }
+                if(CheckCollisionPointRec(MousePos,volume_up)&&IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+                    if(volume<0.2){
+                        volume+=0.01;
+                    }
+                }
                 if(CheckCollisionPointRec(MousePos,quitButton)&&IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
                     goto cleanup;
                 }
+
+                SetMusicVolume(BackgroundMusic,volume);
+
+                cerr<<volume<<'\n';
+
                 break;
             }
             case Gameplay:{
@@ -348,6 +365,14 @@ int main(){
                 bool hoverPlay = CheckCollisionPointRec(MousePos, playButton);
                 DrawRectangleRec(playButton, hoverPlay ? DARKGREEN : LIME);
                 DrawText("PLAY", playButton.x + (playButton.width - MeasureText("PLAY", 20)) / 2, playButton.y + 15, 20, BLACK);
+
+                bool hoverVolume_down = CheckCollisionPointRec(MousePos, volume_down);
+                DrawRectangleRec(volume_down, hoverVolume_down ? DARKGREEN : LIME);
+                DrawText("Volume Down", volume_down.x + (volume_down.width - MeasureText("Volume Down", 20)) / 2, volume_down.y + 15, 20, BLACK);
+
+                bool hoverVolume_up = CheckCollisionPointRec(MousePos, volume_up);
+                DrawRectangleRec(volume_up, hoverVolume_up ? DARKGREEN : LIME);
+                DrawText("Volume Up", volume_up.x + (volume_up.width - MeasureText("Volume Up", 20)) / 2, volume_up.y + 15, 20, BLACK);
 
                 bool hoverQuit = CheckCollisionPointRec(MousePos, quitButton);
                 DrawRectangleRec(quitButton, hoverQuit ? MAROON : RED);
