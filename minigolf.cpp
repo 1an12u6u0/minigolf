@@ -171,8 +171,9 @@ class Hole{
             DrawCircle(x,y,radius,BLACK);
         }
 
-        bool Check(){
+        bool Check(Sound hit){
             if(CheckCollisionCircles(Vector2{x,y},radius,Vector2{ball.x,ball.y},ball.radius)){
+                PlaySound(hit);
                 return 1;
             }
             return 0;
@@ -255,9 +256,11 @@ int main(){
     GameState CurrentState=Menu;
 
     Sound ball_hit=LoadSound("ball-sound.mp3");
+    Sound hole_hit=LoadSound("hole_sound.mp3");
     Music BackgroundMusic=LoadMusicStream("background.mp3");
 
     SetSoundVolume(ball_hit,0.3f);
+    SetSoundVolume(hole_hit,0.3f);
 
     PlayMusicStream(BackgroundMusic);
 
@@ -305,13 +308,14 @@ int main(){
 
                 SetMusicVolume(BackgroundMusic,volume);
 
-                cerr<<volume<<'\n';
+                //cerr<<volume<<'\n';
+                
 
                 break;
             }
             case Gameplay:{
 
-                if(hole.Check()==1){
+                if(hole.Check(hole_hit)==1){
                     level++;
                     ChangeLevel(level,ball_hit);
                 }
