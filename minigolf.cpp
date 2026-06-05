@@ -29,20 +29,31 @@ class Ball{
         void level(int level_number){
             switch(level_number){
                 case 1:{
+                    speedx=0;
+                    speedy=0;
                     x=GetScreenWidth()/2;
                     y=740;
+                    break;
                 }
                 case 2:{
-                    
+                    speedx=0;
+                    speedy=0;
+                    x=GetScreenWidth()/2;
+                    y=740;
+                    break;
                 }
                 case 3:{
-                    
+                    speedx=0;
+                    speedy=0;
+                    x=GetScreenWidth()/5*4;
+                    y=740;
+                    break;
                 }
                 case 4:{
-                    
+                    break;
                 }
                 case 5:{
-                    
+                    break;
                 }
             }
         }
@@ -70,7 +81,7 @@ class Ball{
         }
         void CheckRec(Rectangle rec1,Rectangle rec2,Sound ball_hit){
             if(CheckCollisionCircleRec(Vector2{x,y},radius,rec1)){
-                if (x<rec1.x||x>rec1.x+rec1.width) {
+                if (x<rec1.x-10||x>rec1.x+10+rec1.width) {
                     speedx*=-1;
                     PlaySound(ball_hit);
                 } else {
@@ -79,7 +90,7 @@ class Ball{
                 }
             }
             if(CheckCollisionCircleRec(Vector2{x,y},radius,rec2)){
-                if (x<rec2.x||x>rec2.x+rec2.width) {
+                if (x<rec2.x-10||x>rec2.x+10+rec2.width) {
                     speedx*=-1;
                     PlaySound(ball_hit);
                 } else {
@@ -117,21 +128,23 @@ class Hole{
                 case 1:{
                     x=GetScreenWidth()/2;
                     y=200;
+                    break;
                 }
                 case 2:{
-                    
+                    x=GetScreenWidth()/2;
+                    y=200;
+                    break;
                 }
                 case 3:{
-                    
+                    x=GetScreenWidth()/5-radius;
+                    y=100;
+                    break;
                 }
                 case 4:{
-                    
+                    break;
                 }
                 case 5:{
-                    
-                }
-                case 6:{
-                    
+                    break;
                 }
             }
         }
@@ -140,10 +153,11 @@ class Hole{
             DrawCircle(x,y,radius,BLACK);
         }
 
-        void Check(){
+        bool Check(){
             if(CheckCollisionCircles(Vector2{x,y},radius,Vector2{ball.x,ball.y},ball.radius)){
-                level++;
+                return 1;
             }
+            return 0;
         }
 };
 
@@ -159,18 +173,33 @@ class Levels{
                     DrawRectangleRec(rec2,WHITE);
 
                     ball.CheckRec(rec1,rec2,ball_hit);
+                    break;
                 }
                 case 2:{
+                    Rectangle rec1={GetScreenWidth()/3-200,GetScreenHeight()/3,400,100};
+                    Rectangle rec2={GetScreenWidth()/3*2-200,GetScreenHeight()/3*2-50,400,100};
                     
+                    DrawRectangleRec(rec1,WHITE);
+                    DrawRectangleRec(rec2,WHITE);
+
+                    ball.CheckRec(rec1,rec2,ball_hit);
+                    break;
                 }
                 case 3:{
+                    Rectangle rec1={GetScreenWidth()/3*2-150,GetScreenHeight()/3-200,300,300};
+                    Rectangle rec2={GetScreenWidth()/3-150,GetScreenHeight()/5*4-200,300,300};
                     
+                    DrawRectangleRec(rec1,WHITE);
+                    DrawRectangleRec(rec2,WHITE);
+
+                    ball.CheckRec(rec1,rec2,ball_hit);
+                    break;
                 }
                 case 4:{
-                    
+                    break;
                 }
                 case 5:{
-                    
+                    break;
                 }
             }
         }
@@ -216,6 +245,8 @@ int main(){
 
     int change=0;
     
+    ChangeLevel(level,ball_hit);
+
     while(!WindowShouldClose()){
 
         UpdateMusicStream(BackgroundMusic);
@@ -238,7 +269,10 @@ int main(){
             }
             case Gameplay:{
 
-                hole.Check();
+                if(hole.Check()==1){
+                    level++;
+                    ChangeLevel(level,ball_hit);
+                }
 
                 if(ball.speedx==0&&ball.speedy==0){
                     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
@@ -273,6 +307,8 @@ int main(){
                 ball.Check(ball_hit);
 
                 ball.Update();
+
+                break;
             }
         }
         
@@ -295,11 +331,6 @@ int main(){
                 break;
             }
             case Gameplay:{
-                
-                if(change<level){
-                    ChangeLevel(level,ball_hit);
-                    change=level;
-                }
 
                 DrawBlocks();
                 Level.Draw(level,ball_hit);
