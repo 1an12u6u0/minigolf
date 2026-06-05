@@ -8,7 +8,7 @@ const int cellcountx=25;
 const int cellcounty=30;
 const int cellsize=30;
 
-int level=1;
+int level=4;
 int points=0;
 
 enum GameState{Menu,Gameplay};
@@ -50,6 +50,10 @@ class Ball{
                     break;
                 }
                 case 4:{
+                    speedx=0;
+                    speedy=0;
+                    x=GetScreenWidth()/5;
+                    y=800;
                     break;
                 }
                 case 5:{
@@ -77,6 +81,18 @@ class Ball{
             if(y-radius<cellsize||y+radius>cellcounty*cellsize-cellsize){
                 PlaySound(ball_hit);
                 speedy*=-1;
+            }
+            if(x-radius<cellsize-15){
+                x+=cellsize;
+            }
+            if(x+radius>cellcountx*cellsize+15){
+                x-=cellsize;
+            }
+            if(y-radius<cellsize-15){
+                y+=cellsize;
+            }
+            if(y+radius>cellcounty*cellsize+15){
+                y-=cellsize;
             }
         }
         void CheckRec(Rectangle rec1,Rectangle rec2,Sound ball_hit){
@@ -141,6 +157,8 @@ class Hole{
                     break;
                 }
                 case 4:{
+                    x=GetScreenWidth()-100-radius;
+                    y=100;
                     break;
                 }
                 case 5:{
@@ -196,6 +214,13 @@ class Levels{
                     break;
                 }
                 case 4:{
+                    Rectangle rec1={GetScreenWidth()/3*2-350,GetScreenHeight()/3-150,700,200};
+                    Rectangle rec2={GetScreenWidth()/7-200,GetScreenHeight()/5*2+150,700,200};
+                    
+                    DrawRectangleRec(rec1,WHITE);
+                    DrawRectangleRec(rec2,WHITE);
+
+                    ball.CheckRec(rec1,rec2,ball_hit);
                     break;
                 }
                 case 5:{
