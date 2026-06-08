@@ -97,19 +97,21 @@ class Ball{
         }
         void CheckRec(Rectangle rec1,Rectangle rec2,Sound ball_hit){
             if(CheckCollisionCircleRec(Vector2{x,y},radius,rec1)){
-                if (x<rec1.x-10||x>rec1.x+10+rec1.width) {
+                if (x+radius<rec1.x||x-radius>rec1.x+rec1.width) {
                     speedx*=-1;
                     PlaySound(ball_hit);
-                } else {
+                } 
+                if(y+radius>rec1.y||y-radius<rec1.y+rec1.height){
                     speedy*=-1;
                     PlaySound(ball_hit);
                 }
             }
             if(CheckCollisionCircleRec(Vector2{x,y},radius,rec2)){
-                if (x<rec2.x-10||x>rec2.x+10+rec2.width) {
+                if (x+radius<rec2.x||x-radius>rec2.x+rec2.width) {
                     speedx*=-1;
                     PlaySound(ball_hit);
-                } else {
+                } 
+                if(y+radius>rec2.y||y-radius<rec2.y+rec2.height){
                     speedy*=-1;
                     PlaySound(ball_hit);
                 }
@@ -419,6 +421,7 @@ int main(){
     }
     cleanup:
         UnloadSound(ball_hit);
+        UnloadMusicStream(BackgroundMusic);
         CloseAudioDevice();
         CloseWindow();
 
