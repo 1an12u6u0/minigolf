@@ -1,8 +1,11 @@
 #include <raylib.h>
 #include <iostream>
+#include <fstream>
 #include <cmath>
 
 using namespace std;
+
+ifstream fin ("data.in");
 
 const int cellcountx=25;
 const int cellcounty=30;
@@ -26,13 +29,18 @@ class Ball{
             DrawCircle(x,y,radius,WHITE);
         }
 
+        void Read(){
+            speedx=0;
+            speedy=0;
+            fin>>x;
+            fin>>y;
+        }
+        /*
         void level(int level_number){
             switch(level_number){
                 case 1:{
                     speedx=0;
                     speedy=0;
-                    x=GetScreenWidth()/2;
-                    y=740;
                     break;
                 }
                 case 2:{
@@ -60,7 +68,7 @@ class Ball{
                     break;
                 }
             }
-        }
+        }*/
 
         void Update(){
             speedx*=friction;
@@ -94,27 +102,34 @@ class Ball{
             if(y+radius>cellcounty*cellsize+15){
                 y-=cellsize;
             }
-        }
-        void CheckRec(Rectangle rec1,Rectangle rec2,Sound ball_hit){
+        }void CheckRec(Rectangle rec1,Rectangle rec2,Sound ball_hit){
             if(CheckCollisionCircleRec(Vector2{x,y},radius,rec1)){
-                if (x+radius<rec1.x||x-radius>rec1.x+rec1.width) {
+                float cx=(x<rec1.x)?rec1.x:((x>rec1.x+rec1.width)?rec1.x+rec1.width:x);
+                float cy=(y<rec1.y)?rec1.y:((y>rec1.y+rec1.height)?rec1.y+rec1.height:y);
+                float ox=abs(x-cx);
+                float oy=abs(y-cy);
+                if(ox>oy){
                     speedx*=-1;
-                    PlaySound(ball_hit);
-                } 
-                if(y+radius>rec1.y||y-radius<rec1.y+rec1.height){
+                    x=(x<rec1.x)?rec1.x-radius:rec1.x+rec1.width+radius;
+                }else{
                     speedy*=-1;
-                    PlaySound(ball_hit);
+                    y=(y<rec1.y)?rec1.y-radius:rec1.y+rec1.height+radius;
                 }
+                PlaySound(ball_hit);
             }
             if(CheckCollisionCircleRec(Vector2{x,y},radius,rec2)){
-                if (x+radius<rec2.x||x-radius>rec2.x+rec2.width) {
+                float cx=(x<rec2.x)?rec2.x:((x>rec2.x+rec2.width)?rec2.x+rec2.width:x);
+                float cy=(y<rec2.y)?rec2.y:((y>rec2.y+rec2.height)?rec2.y+rec2.height:y);
+                float ox=abs(x-cx);
+                float oy=abs(y-cy);
+                if(ox>oy){
                     speedx*=-1;
-                    PlaySound(ball_hit);
-                } 
-                if(y+radius>rec2.y||y-radius<rec2.y+rec2.height){
+                    x=(x<rec2.x)?rec2.x-radius:rec2.x+rec2.width+radius;
+                }else{
                     speedy*=-1;
-                    PlaySound(ball_hit);
+                    y=(y<rec2.y)?rec2.y-radius:rec2.y+rec2.height+radius;
                 }
+                PlaySound(ball_hit);
             }
         }
 };
@@ -141,7 +156,7 @@ class Hole{
         float y=0;
         float radius=15;
 
-        void Change(int level_number){
+        /*void Change(int level_number){
             switch (level_number){
                 case 1:{
                     x=GetScreenWidth()/2;
@@ -167,10 +182,15 @@ class Hole{
                     break;
                 }
             }
-        }
+        }*/
 
         void Draw(){
             DrawCircle(x,y,radius,BLACK);
+        }
+
+        void Read(){
+            fin>>x;
+            fin>>y;
         }
 
         bool Check(Sound hit){
@@ -184,8 +204,22 @@ class Hole{
 
 class Levels{
     public:
-        void Draw(int level_number,Sound ball_hit){
-            switch(level_number){
+        float x1,y1,x2,y2;
+
+        void Read(){
+            fin>>x1>>y1;
+            fin>>x2>>y2;
+        }
+
+        void Draw(Sound ball_hit){
+            Rectangle rec1={x1,y1,400,100};
+            Rectangle rec2={x2,y2,400,100};
+            
+            DrawRectangleRec(rec1,WHITE);
+            DrawRectangleRec(rec2,WHITE);
+
+            ball.CheckRec(rec1,rec2,ball_hit);
+            /*switch(level_number){
                 case 1:{
                     Rectangle rec1={GetScreenWidth()/3-400,GetScreenHeight()/2,400,100};
                     Rectangle rec2={GetScreenWidth()/3*2,GetScreenHeight()/2,400,100};
@@ -229,18 +263,24 @@ class Levels{
                 case 5:{
                     break;
                 }
-            }
+            }*/
         }
 };
 
 Hole hole;
 Levels Level;
 
-void ChangeLevel(int level_number,Sound ball_hit){
-    hole.Change(level_number);
-    Level.Draw(level_number,ball_hit);
-    ball.level(level_number);
-}   
+/*void ChangeLevel(int level_number,Sound ball_hit){
+    //hole.Change(level_number);
+    Level.Draw(ball_hit);
+    //ball.level(level_number);
+}*/
+
+void ReadLevel(){
+    ball.Read();
+    hole.Read();
+    Level.Read();
+}
 
 int main(){
     
@@ -277,7 +317,7 @@ int main(){
 
     int change=0;
     
-    ChangeLevel(level,ball_hit);
+    ReadLevel();
 
     while(!WindowShouldClose()){
 
@@ -319,7 +359,7 @@ int main(){
 
                 if(hole.Check(hole_hit)==1){
                     level++;
-                    ChangeLevel(level,ball_hit);
+                    ReadLevel();
                 }
 
                 if(ball.speedx==0&&ball.speedy==0){
@@ -389,7 +429,7 @@ int main(){
             case Gameplay:{
 
                 DrawBlocks();
-                Level.Draw(level,ball_hit);
+                Level.Draw(ball_hit);
                 hole.Draw();
                 DrawText(TextFormat("Current level: %i",level),GetScreenWidth()/2-50*3-60,70,50,edges);
                 DrawText(TextFormat("Current points: %i",points),GetScreenWidth()/2-50*3-60,GetScreenHeight()-120,50,edges);
