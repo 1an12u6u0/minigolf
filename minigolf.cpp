@@ -14,6 +14,16 @@ const int cellsize=30;
 int level=1;
 int points=0;
 
+float oldtime=0;
+bool Time(float interval){ 
+    float time=GetTime();
+    if(time-oldtime>=interval){
+        oldtime=time;
+        return 1;
+    }
+    return 0;
+}
+
 enum GameState{Menu,Gameplay};
 
 class Ball{
@@ -35,40 +45,6 @@ class Ball{
             fin>>x;
             fin>>y;
         }
-        /*
-        void level(int level_number){
-            switch(level_number){
-                case 1:{
-                    speedx=0;
-                    speedy=0;
-                    break;
-                }
-                case 2:{
-                    speedx=0;
-                    speedy=0;
-                    x=GetScreenWidth()/2;
-                    y=740;
-                    break;
-                }
-                case 3:{
-                    speedx=0;
-                    speedy=0;
-                    x=GetScreenWidth()/5*4;
-                    y=740;
-                    break;
-                }
-                case 4:{
-                    speedx=0;
-                    speedy=0;
-                    x=GetScreenWidth()/5;
-                    y=800;
-                    break;
-                }
-                case 5:{
-                    break;
-                }
-            }
-        }*/
 
         void Update(){
             speedx*=friction;
@@ -156,34 +132,6 @@ class Hole{
         float y=0;
         float radius=15;
 
-        /*void Change(int level_number){
-            switch (level_number){
-                case 1:{
-                    x=GetScreenWidth()/2;
-                    y=200;
-                    break;
-                }
-                case 2:{
-                    x=GetScreenWidth()/2;
-                    y=200;
-                    break;
-                }
-                case 3:{
-                    x=GetScreenWidth()/5-radius;
-                    y=100;
-                    break;
-                }
-                case 4:{
-                    x=GetScreenWidth()-100-radius;
-                    y=100;
-                    break;
-                }
-                case 5:{
-                    break;
-                }
-            }
-        }*/
-
         void Draw(){
             DrawCircle(x,y,radius,BLACK);
         }
@@ -219,62 +167,11 @@ class Levels{
             DrawRectangleRec(rec2,WHITE);
 
             ball.CheckRec(rec1,rec2,ball_hit);
-            /*switch(level_number){
-                case 1:{
-                    Rectangle rec1={GetScreenWidth()/3-400,GetScreenHeight()/2,400,100};
-                    Rectangle rec2={GetScreenWidth()/3*2,GetScreenHeight()/2,400,100};
-                    
-                    DrawRectangleRec(rec1,WHITE);
-                    DrawRectangleRec(rec2,WHITE);
-
-                    ball.CheckRec(rec1,rec2,ball_hit);
-                    break;
-                }
-                case 2:{
-                    Rectangle rec1={GetScreenWidth()/3-200,GetScreenHeight()/3,400,100};
-                    Rectangle rec2={GetScreenWidth()/3*2-200,GetScreenHeight()/3*2-50,400,100};
-                    
-                    DrawRectangleRec(rec1,WHITE);
-                    DrawRectangleRec(rec2,WHITE);
-
-                    ball.CheckRec(rec1,rec2,ball_hit);
-                    break;
-                }
-                case 3:{
-                    Rectangle rec1={GetScreenWidth()/3*2-150,GetScreenHeight()/3-200,300,300};
-                    Rectangle rec2={GetScreenWidth()/3-150,GetScreenHeight()/5*4-200,300,300};
-                    
-                    DrawRectangleRec(rec1,WHITE);
-                    DrawRectangleRec(rec2,WHITE);
-
-                    ball.CheckRec(rec1,rec2,ball_hit);
-                    break;
-                }
-                case 4:{
-                    Rectangle rec1={GetScreenWidth()/3*2-350,GetScreenHeight()/3-150,700,200};
-                    Rectangle rec2={GetScreenWidth()/7-200,GetScreenHeight()/5*2+150,700,200};
-                    
-                    DrawRectangleRec(rec1,WHITE);
-                    DrawRectangleRec(rec2,WHITE);
-
-                    ball.CheckRec(rec1,rec2,ball_hit);
-                    break;
-                }
-                case 5:{
-                    break;
-                }
-            }*/
         }
 };
 
 Hole hole;
 Levels Level;
-
-/*void ChangeLevel(int level_number,Sound ball_hit){
-    //hole.Change(level_number);
-    Level.Draw(ball_hit);
-    //ball.level(level_number);
-}*/
 
 void ReadLevel(){
     ball.Read();
@@ -358,7 +255,15 @@ int main(){
             case Gameplay:{
 
                 if(hole.Check(hole_hit)==1){
-                    level++;
+                    if(level==100){
+                        CurrentState=Menu;
+                        level=1;
+                        fin.clear();
+                        fin.seekg(0,ios::beg);
+                    }
+                    else{
+                        level++;
+                    }
                     ReadLevel();
                 }
 
